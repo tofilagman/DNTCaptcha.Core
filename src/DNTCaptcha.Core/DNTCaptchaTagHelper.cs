@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -107,7 +108,7 @@ namespace DNTCaptcha.Core
             output.Content.AppendHtml(captchaImage);
 
             var cookieToken = $".{captchaDivId}";
-            var refreshButton = getRefreshButtonTagBuilder(ViewContext, captchaDivId, cookieToken);
+            var refreshButton = getRefreshButtonTagBuilder(ViewContext, captchaDivId, cookieToken).GetString();
             output.Content.AppendHtml(refreshButton);
 
             var hiddenInput = getHiddenInputTagBuilder(encryptedText);
@@ -174,6 +175,10 @@ namespace DNTCaptcha.Core
             hiddenInput.Attributes.Add("name", _captchaOptions.CaptchaComponent.CaptchaHiddenTokenName);
             hiddenInput.Attributes.Add("type", "hidden");
             hiddenInput.Attributes.Add("value", token);
+
+            var textAttr = HiddenTokenAttribute.Split("|");
+            hiddenInput.Attributes.Add(textAttr[0], textAttr[1]);
+
             return hiddenInput;
         }
 
@@ -239,7 +244,9 @@ namespace DNTCaptcha.Core
                 RefreshButtonClass = RefreshButtonClass,
                 DisplayMode = DisplayMode,
                 UseRelativeUrls = UseRelativeUrls,
-                UseNoise = UseNoise
+                UseNoise = UseNoise,
+                TextBoxAttribute = TextBoxAttribute,
+                HiddenTokenAttribute = HiddenTokenAttribute
             };
             var serializedValues = _serializationProvider.Serialize(values);
             var encryptSerializedValues = _captchaProtectionProvider.Encrypt(serializedValues);
@@ -265,7 +272,13 @@ namespace DNTCaptcha.Core
             refreshButton.Attributes.Add("data-ajax-mode", "replace-with");
             refreshButton.Attributes.Add("data-ajax-update", $"#{captchaDivId}");
             refreshButton.Attributes.Add("data-ajax-begin", DataAjaxBeginFunctionName);
-            refreshButton.Attributes.Add("class", RefreshButtonClass);
+           
+
+            var refButtonContent = new TagBuilder("i");
+            refButtonContent.Attributes.Add("class", RefreshButtonClass);
+
+            refreshButton.InnerHtml.AppendHtml(refButtonContent);
+
             return refreshButton;
         }
 
@@ -297,6 +310,10 @@ namespace DNTCaptcha.Core
             textInput.Attributes.Add("dir", Dir);
             textInput.Attributes.Add("type", "text");
             textInput.Attributes.Add("value", "");
+
+            var textAttr = TextBoxAttribute.Split("|");
+            textInput.Attributes.Add(textAttr[0], textAttr[1]);
+
             return textInput;
         }
 

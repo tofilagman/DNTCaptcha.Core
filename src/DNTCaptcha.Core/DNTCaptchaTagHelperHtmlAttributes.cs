@@ -113,6 +113,18 @@ namespace DNTCaptcha.Core
         public bool UseNoise { set; get; }
 
         /// <summary>
+        /// Add Custom Attribute use | to split the key value pair
+        /// </summary>
+        [HtmlAttributeName("asp-text-box-attribute")]
+        public string TextBoxAttribute { get; set; } = "attr|attr";
+
+        /// <summary>
+        /// Add Custom Attribute use | to split the key value pair
+        /// </summary>
+        [HtmlAttributeName("asp-hidden-token-attribute")]
+        public string HiddenTokenAttribute { get; set; } = "attr|attr";
+
+        /// <summary>
         /// The Captcha Token
         /// </summary>
         [HtmlAttributeNotBound]

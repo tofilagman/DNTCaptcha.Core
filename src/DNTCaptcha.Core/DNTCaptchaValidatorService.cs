@@ -96,6 +96,52 @@ namespace DNTCaptcha.Core
             return isValidCookie(httpContext, decryptedText, cookieToken);
         }
 
+        /// <summary>
+        /// Validates Input
+        /// </summary>
+        /// <param name="captchaGeneratorLanguage"></param>
+        /// <param name="captchaGeneratorDisplayMode"></param>
+        /// <param name="inputText"></param>
+        /// <param name="captchaText"></param>
+        /// <returns></returns>
+        public bool HasValidCaptchaEntry(Language captchaGeneratorLanguage, DisplayMode captchaGeneratorDisplayMode, string inputText, string captchaText)
+        {
+            if (string.IsNullOrEmpty(captchaText))
+            {
+                _logger.LogDebug("CaptchaHiddenInput is empty.");
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(inputText))
+            {
+                _logger.LogDebug("CaptchaInput is empty.");
+                return false;
+            }
+
+            inputText = inputText.ToEnglishNumbers();
+
+            if (!long.TryParse(
+                inputText,
+                NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands,
+                CultureInfo.InvariantCulture,
+                out long inputNumber))
+            {
+                _logger.LogDebug("inputText is not a number.");
+                return false;
+            }
+
+            var decryptedText = _captchaProtectionProvider.Decrypt(captchaText);
+
+            var numberToText = _captchaTextProvider(captchaGeneratorDisplayMode).GetText(inputNumber, captchaGeneratorLanguage);
+            if (decryptedText?.Equals(numberToText, StringComparison.Ordinal) != true)
+            {
+                _logger.LogDebug($"{decryptedText} != {numberToText}");
+                return false;
+            }
+
+            return true;
+        }
+
         private bool isValidCookie(HttpContext httpContext, string decryptedText, string? cookieToken)
         {
             if (string.IsNullOrEmpty(cookieToken))
