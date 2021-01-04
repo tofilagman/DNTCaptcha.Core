@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Description>DNTCaptcha.Core is a captcha generator and validator for ASP.NET Core applications.</Description>
+    <Description>z.Captcha.Core is a fork of DNTCaptcha.Core is a captcha generator and validator for ASP.NET Core applications.</Description>
     <VersionPrefix>3.1.0</VersionPrefix>
     <Authors>Vahid Nasiri</Authors>
     <TargetFrameworks>net5.0;netcoreapp3.1</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>DNTCaptcha.Core</AssemblyName>
-    <PackageId>DNTCaptcha.Core</PackageId>
+    <AssemblyName>z.Captcha.Core</AssemblyName>
+    <PackageId>z.Captcha.Core</PackageId>
     <PackageTags>MVC;aspnetcore;captcha;.NET Core</PackageTags>
     <PackageProjectUrl>https://github.com/VahidN/DNTCaptcha.Core</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
@@ -36,6 +36,7 @@
     <Deterministic>true</Deterministic>
     <Features>strict</Features>
     <ReportAnalyzer>true</ReportAnalyzer>
+    <Version>3.1.1</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Meziantou.Analyzer" Version="1.0.643">
