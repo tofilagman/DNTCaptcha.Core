@@ -149,33 +149,42 @@ namespace DNTCaptcha.Core
         [HttpGet("[action]"), HttpPost("[action]")]
         public IActionResult Show(string data)
         {
-            if (string.IsNullOrWhiteSpace(data))
+            try
             {
-                return BadRequest();
-            }
+                if (string.IsNullOrWhiteSpace(data))
+                {
+                    return BadRequest();
+                }
 
-            var decryptedModel = _captchaProtectionProvider.Decrypt(data);
-            if (decryptedModel == null)
+                var decryptedModel = _captchaProtectionProvider.Decrypt(data);
+                if (decryptedModel == null)
+                {
+                    return BadRequest();
+                }
+
+                var model = _serializationProvider.Deserialize<CaptchaImageParams>(decryptedModel);
+                if (model == null)
+                {
+                    return BadRequest();
+                }
+
+                var decryptedText = _captchaProtectionProvider.Decrypt(model.Text);
+                if (decryptedText == null)
+                {
+                    return BadRequest();
+                }
+
+                var image = model.UseNoise ?
+                    _captchaImageProvider.DrawCaptcha(decryptedText, model.ForeColor, model.FontSize, model.FontName) :
+                    _captchaImageProvider.DrawCaptcha(decryptedText, model.ForeColor, model.BackColor, model.FontSize, model.FontName);
+                return new FileContentResult(image, "image/png");
+            }
+#pragma warning disable CA1031 // Do not catch general exception types
+            catch (Exception ex)
+#pragma warning restore CA1031 // Do not catch general exception types
             {
-                return BadRequest();
+                return BadRequest(ex);
             }
-
-            var model = _serializationProvider.Deserialize<CaptchaImageParams>(decryptedModel);
-            if (model == null)
-            {
-                return BadRequest();
-            }
-
-            var decryptedText = _captchaProtectionProvider.Decrypt(model.Text);
-            if (decryptedText == null)
-            {
-                return BadRequest();
-            }
-
-            var image = model.UseNoise ?
-                _captchaImageProvider.DrawCaptcha(decryptedText, model.ForeColor, model.FontSize, model.FontName) :
-                _captchaImageProvider.DrawCaptcha(decryptedText, model.ForeColor, model.BackColor, model.FontSize, model.FontName);
-            return new FileContentResult(image, "image/png");
         }
     }
 }
